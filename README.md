@@ -2,10 +2,9 @@
 
 Supported MCU's:
 
-* [GD32F107RC](https://github.com/vanvught/GD32F107RC-DMX512-RDM)
-* [GD32F207RG](https://github.com/vanvught/GD32F207RG-DMX512-RDM)
-* [GD32F207VC](https://github.com/vanvught/GD32207C-EVAL-board-DMX512-RDM)
-* [GD32F407RE](https://github.com/vanvught/GD32F407RE-DMX512-RDM)
+* [GD32F107RC](https://github.com/vanvught/GD32F107RC-Bootloader-TFTP)
+* [GD32F207RG GD32F207VC](https://github.com/vanvught/GD32F207x-Bootloader-TFTP)
+* [GD32F407RE](https://github.com/vanvught/GD32F407RE-Bootloader-TFTP)
 
 Documentation: [https://www.gd32-dmx.org/bootloader.html](https://www.gd32-dmx.org/bootloader.html)
 
