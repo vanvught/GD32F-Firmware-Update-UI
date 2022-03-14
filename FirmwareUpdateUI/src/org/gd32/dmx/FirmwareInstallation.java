@@ -58,14 +58,14 @@ public class FirmwareInstallation extends JDialog {
 	private JCheckBox chckbxReboot;
 	private JTextField textVersion;
 	
-	public FirmwareInstallation(Node node, FirmwareUpdateUI remoteConfig) throws Exception {
+	public FirmwareInstallation(Node node, FirmwareUpdateUI firmwareUpdateUI) throws Exception {
 		InitComponents();
 		CreateEvents();
 
 		setTitle("Workflow Firmware Installation");
 		textNodeInfo.setText(node.toString());
 
-		remoteConfig.sendUDP(node, "!tftp#1");
+		firmwareUpdateUI.sendUDP(node, "!tftp#1");
 		
 		try {
 			Thread.sleep(500);
@@ -73,7 +73,7 @@ public class FirmwareInstallation extends JDialog {
 			e1.printStackTrace();
 		}
 		
-		final String tftpServer = remoteConfig.requestUDP(node, "?tftp#");
+		final String tftpServer = firmwareUpdateUI.requestUDP(node, "?tftp#");
 				
 		chckbxTFTPOn.setSelected(tftpServer.contains("On"));
 
@@ -96,7 +96,7 @@ public class FirmwareInstallation extends JDialog {
 						
 						System.out.println("TFTP Client Closed with result " + frame.result());
 						
-						remoteConfig.sendUDP(node, "!tftp#0");
+						firmwareUpdateUI.sendUDP(node, "!tftp#0");
 						
 						try {
 							Thread.sleep(500);
@@ -104,7 +104,7 @@ public class FirmwareInstallation extends JDialog {
 							e1.printStackTrace();
 						}
 						
-						final String tftpServer = remoteConfig.requestUDP(node, "?tftp#");
+						final String tftpServer = firmwareUpdateUI.requestUDP(node, "?tftp#");
 						
 						chckbxTFTPOff.setSelected(!tftpServer.contains("On"));
 						
@@ -113,7 +113,7 @@ public class FirmwareInstallation extends JDialog {
 						} else {
 							if (frame.result() > 0) {
 								chckbxReboot.setSelected(true);								
-								remoteConfig.sendUDP(node, "?reboot##");
+								firmwareUpdateUI.sendUDP(node, "?reboot##");
 								String version;
 								String progress = "";
 								
@@ -126,13 +126,13 @@ public class FirmwareInstallation extends JDialog {
 									} catch (InterruptedException e) {
 										e.printStackTrace();
 									}
-									version = remoteConfig.requestUDP(node, "?version#");
+									version = firmwareUpdateUI.requestUDP(node, "?version#");
 									System.out.println("[" + version + "]");
 								} while (version.contains("tftp") || (version.contains("ERROR")));
 								
 								textVersion.setForeground(Color.BLUE);
 								textVersion.setText(version.substring(version.indexOf("[")));
-								remoteConfig.constructTree();
+								firmwareUpdateUI.constructTree();
 							}
 						}
 					}

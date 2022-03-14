@@ -456,7 +456,19 @@ public class FirmwareUpdateUI extends JFrame {
 			if (isEnabled) {
 				sendUDP(node, "?reboot##");
 				try {
-					Thread.sleep(2000);
+					String version;
+					Graphics g = getGraphics();
+					do {
+						textArea.append("|");
+						update(g);
+						Thread.sleep(1000);
+						textArea.append("/");
+						update(g);
+						version = requestUDP(node, "?version#");
+						textArea.append("-");
+						update(g);
+					} while (version.contains("ERROR"));
+					textArea.setText("");
 					constructTree();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -471,7 +483,19 @@ public class FirmwareUpdateUI extends JFrame {
 			try {
 				sendUDP(node, "?reboot##");
 				JOptionPane.showMessageDialog(null, "Reboot message has been sent.");
-				Thread.sleep(2000);
+				String version;
+				Graphics g = getGraphics();
+				do {
+					textArea.append("|");
+					update(g);
+					Thread.sleep(1000);
+					textArea.append("/");
+					update(g);
+					version = requestUDP(node, "?version#");
+					textArea.append("-");
+					update(g);
+				} while (version.contains("ERROR"));
+				textArea.setText("");
 				constructTree();
 			} catch (Exception e) {
 				e.printStackTrace();
