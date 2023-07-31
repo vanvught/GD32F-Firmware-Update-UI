@@ -40,6 +40,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -101,11 +102,17 @@ public class FirmwareUpdateUI extends JFrame {
 	private JMenuItem mntmVersion;
 	private JMenu mnWorkflow;
 	private JMenuItem mntmFirmwareInstallation;
+	private JMenu mnNetwork;
+	private JMenuItem mntmSelectInterface;
+	
+	private static InterfaceAddress interfaceAddress;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					NetworkInterfaces networkInterfaces = new NetworkInterfaces();
+					FirmwareUpdateUI.interfaceAddress = networkInterfaces.getInterfaceAddress();
 					FirmwareUpdateUI frame = new FirmwareUpdateUI();
 					frame.setVisible(true);
 					frame.constructTree();
@@ -119,9 +126,9 @@ public class FirmwareUpdateUI extends JFrame {
 	public FirmwareUpdateUI() {
 		System.out.println(System.getProperty("os.name"));
 
-		setTitle("Firmware Update Manager");
+		setTitle(interfaceAddress.getAddress());
 
-		createReceiveSocket();
+		createSocket();
 
 		initComponents();
 		createEvents();
@@ -129,7 +136,7 @@ public class FirmwareUpdateUI extends JFrame {
 
 	private void initComponents() {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setBounds(100, 100, 338, 350);
+		setBounds(100, 100, 408, 350);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -183,6 +190,13 @@ public class FirmwareUpdateUI extends JFrame {
 		
 		mntmFirmwareInstallation = new JMenuItem("Firmware installation");
 		mnWorkflow.add(mntmFirmwareInstallation);
+		
+		mnNetwork = new JMenu("Network");
+		menuBar.add(mnNetwork);
+		
+		mntmSelectInterface = new JMenuItem("Select Interface");
+		mntmSelectInterface.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK));
+		mnNetwork.add(mntmSelectInterface);
 		
 		mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
@@ -357,7 +371,7 @@ public class FirmwareUpdateUI extends JFrame {
 						final DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) path.getPathComponent(1);
 						final Node node = (Node) treeNode.getUserObject();
 						try {
-							TFTPClient client = new TFTPClient("", InetAddress.getByName(node.getIpAdress()));
+							TFTPClient client = new TFTPClient("", InetAddress.getByName(node.getIpAdress()), getInterfaceAddress());
 							client.setVisible(true);
 						} catch (UnknownHostException e1) {
 							e1.printStackTrace();
@@ -384,7 +398,7 @@ public class FirmwareUpdateUI extends JFrame {
 						}
 						
 						try {
-							FirmwareInstallation firmware = new FirmwareInstallation(node, getFirmwareUpdate());
+							FirmwareInstallation firmware = new FirmwareInstallation(node, getFirmwareUpdate(), interfaceAddress);
 							firmware.setVisible(true);
 						} catch (Exception ex) {
 							ex.printStackTrace();
@@ -424,6 +438,22 @@ public class FirmwareUpdateUI extends JFrame {
 				}
 			}
 		});
+		
+		mntmSelectInterface.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doInterfaces();
+			}
+		});
+	}
+	
+	private InterfaceAddress getInterfaceAddress() {
+		return FirmwareUpdateUI.interfaceAddress;
+	}
+	
+	private void doInterfaces() {
+		NetworkInterfaces networkInterfaces;
+		networkInterfaces = new NetworkInterfaces(this);
+		networkInterfaces.Show();
 	}
 	
 	private FirmwareUpdateUI getFirmwareUpdate() {
@@ -509,6 +539,16 @@ public class FirmwareUpdateUI extends JFrame {
 				&& (e.getModifiers() & InputEvent.CTRL_MASK) != 0));
 	}
 	
+	public void setTitle(InetAddress inetAddress) {
+		String text = inetAddress.getHostAddress();
+		setTitle("Firmware Update Manager " + text);
+	}
+	
+	public void setInterfaceAddress(InterfaceAddress interfaceAddress) {
+		FirmwareUpdateUI.interfaceAddress = interfaceAddress;
+		createSocket();
+	}
+	
 	public void constructTree() {
 		Graphics g = getGraphics();
 
@@ -522,14 +562,9 @@ public class FirmwareUpdateUI extends JFrame {
 
 		treeMap = new TreeMap<Integer, Node>();
 		
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 1; i++) {
 			try {
-				if (i == 0) {
-					broadcast("?list#*");
-					broadcast("?list#*");
-				} else {
-					broadcast("?list#");
-				}
+				broadcast("?list#");
 				while (true) {
 					byte[] buffer = new byte[BUFFERSIZE];
 					DatagramPacket dpack = new DatagramPacket(buffer, buffer.length);
@@ -647,13 +682,13 @@ public class FirmwareUpdateUI extends JFrame {
 		return new String("#ERROR - time out");
 	}
 
-	private void createReceiveSocket() {
+	private void createSocket() {
 		if (socketReceive != null) {
 			socketReceive.close();
 		}
 		try {
 			socketReceive = new DatagramSocket(null);
-			SocketAddress sockaddr = new InetSocketAddress(PORT);
+			SocketAddress sockaddr = new InetSocketAddress(interfaceAddress.getAddress(), PORT);
 			socketReceive.setBroadcast(true);
 			socketReceive.setSoTimeout(1000);
 			socketReceive.bind(sockaddr);

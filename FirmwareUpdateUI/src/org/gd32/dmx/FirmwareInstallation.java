@@ -33,6 +33,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -58,7 +59,7 @@ public class FirmwareInstallation extends JDialog {
 	private JCheckBox chckbxReboot;
 	private JTextField textVersion;
 	
-	public FirmwareInstallation(Node node, FirmwareUpdateUI firmwareUpdateUI) throws Exception {
+	public FirmwareInstallation(Node node, FirmwareUpdateUI firmwareUpdateUI, InterfaceAddress interfaceAddress) throws Exception {
 		InitComponents();
 		CreateEvents();
 
@@ -80,7 +81,7 @@ public class FirmwareInstallation extends JDialog {
 		if (!tftpServer.contains("On")) {
 			// Error
 		} else {
-			TFTPClient frame = new TFTPClient("", InetAddress.getByName(node.getIpAdress()));
+			TFTPClient frame = new TFTPClient("", InetAddress.getByName(node.getIpAdress()), interfaceAddress);
 			frame.setVisible(true);
 
 			Thread t = new Thread() {
@@ -104,7 +105,11 @@ public class FirmwareInstallation extends JDialog {
 							e1.printStackTrace();
 						}
 						
-						final String tftpServer = firmwareUpdateUI.requestUDP(node, "?tftp#");
+						String tftpServer;
+						
+						do {
+							tftpServer = firmwareUpdateUI.requestUDP(node, "?tftp#");
+						} while (tftpServer.contains("ERROR"));
 						
 						chckbxTFTPOff.setSelected(!tftpServer.contains("On"));
 						

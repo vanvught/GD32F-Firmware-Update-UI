@@ -26,7 +26,7 @@
 package org.gd32.dmx;
 
 public class Node {
-	private static final String[] NODE_NAMES = {"Bootloader TFTP", "Art-Net", "sACN E1.31", "OSC Server"};
+	private static final String[] NODE_NAMES = {"Bootloader TFTP", "Art-Net", "sACN E1.31", "OSC Server", "Node"};
 
 	private boolean isValid = false;
 	private boolean isBootloader = false;
