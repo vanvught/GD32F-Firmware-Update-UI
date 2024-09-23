@@ -2,7 +2,7 @@
  * @file TFTPClient.java
  *
  */
-/* Copyright (C) 2022-2023 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2022-2024 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -190,6 +190,9 @@ public class TFTPClient extends JDialog {
 							return true;
 						}
 						if (f.getName().equals("gd32f4xx.bin")) {
+							return true;
+						}
+						if (f.getName().equals("gd32h7xx.bin")) {
 							return true;
 						}
 						if (f.getName().equals("gd32.bin")) {
