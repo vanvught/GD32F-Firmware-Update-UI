@@ -2,7 +2,7 @@
  * @file Node.java
  *
  */
-/* Copyright (C) 2022 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2022-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,8 @@
 package org.gd32.dmx;
 
 public class Node {
-	private static final String[] NODE_NAMES = {"Bootloader TFTP", "Art-Net", "sACN E1.31", "OSC Server", "Node"};
+	private static final String[] NODE_NAMES = { "Bootloader TFTP", "Art-Net", "sACN E1.31", "OSC Client", "OSC Server",
+			"DDP Display", "PixelPusher" };
 
 	private boolean isValid = false;
 	private boolean isBootloader = false;
@@ -38,10 +39,10 @@ public class Node {
 	public Node(String arg) {
 		super();
 		System.out.println("arg [" + arg + "]");
-		
+
 		String[] values = arg.split(",");
-			
-		if (values.length >= 4) {		
+
+		if (values.length >= 4) {
 			isValid = isValidNodeName(values[1]);
 			if (isValid) {
 				if (values[1].equals(NODE_NAMES[0])) {
@@ -55,7 +56,7 @@ public class Node {
 				}
 			}
 		}
-		
+
 		if (isValid) {
 			if (values.length == 5) {
 				displayName = values[4];
@@ -64,7 +65,7 @@ public class Node {
 			}
 		}
 	}
-	
+
 	private boolean isValidNodeName(String name) {
 		for (int i = 0; i < NODE_NAMES.length; i++) {
 			if (name.equals(NODE_NAMES[i])) {
@@ -81,24 +82,24 @@ public class Node {
 	public boolean isBootLoader() {
 		return isBootloader;
 	}
-	
+
 	public String getIpAdress() {
 		return ipAddress;
 	}
-	
+
 	public String getOutputName() {
 		return outputName;
 	}
-	
+
 	public String getDisplayName() {
 		return displayName;
 	}
-	
+
 	@Override
 	public String toString() {
 		if ((ipAddress != null) && (nodeName != null)) {
-			return ipAddress + " | " + nodeName ;
-		}	
+			return ipAddress + " | " + nodeName;
+		}
 		return "Unknown";
 	}
 }
